@@ -1,6 +1,9 @@
 package HW_JDK_05;
 
-import java.util.concurrent.CountDownLatch;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.Semaphore;
 /*
 Задание 1. В качестве задачи предлагается решить классическую задачу про обедающих философов
 Условие:
@@ -10,134 +13,26 @@ import java.util.concurrent.CountDownLatch;
 ● Не должно возникнуть общей блокировки
 ● Философы не должны есть больше одного раза подряд
  */
-/*
-Создать два класс ObjectA, ObjectB
-Реализовать класс в котором два потока вызовут DeadLock
- */
-/*
-Создайте два потока A и B.
-Поток A меняет значение Boolean переменной switcher с задержкой 1000 миллисекунд (true в состояние false и наоборот).
-Поток B ожидает состояния true переменной switcher и выводит на консоль обратный отсчет от 100 с задержкой 100
-миллисекунд и приостанавливает свое действие, как только поток A переключит switcher в состояние false.
-Условием завершения работы потоков является достижение отсчета нулевой отметки.
- */
-/*
-3 бегуна должны прийти к старту гонки
-Программа должна гарантировать, что гонка начнется только когда все три участника будут на старте
-Программа должна отсчитать “На старт”, “Внимание”, “Марш”
-Программа должна завершиться когда все участники закончат гонку.
- */
 public class Main {
-    static boolean switcher = false;
-    static boolean flag = true;
+    private static final int NUMBER_SEATS = 1;
+    public static void main(String[] args) {
+        Phaser eat = new Phaser(1);
+        Semaphore dinnerTable = new Semaphore(NUMBER_SEATS);
+        ArrayList<Philosopher> university = new ArrayList<>();
+        university.add(new Philosopher("Aristotle", dinnerTable, eat));
+        university.add(new Philosopher("Nietzsche", dinnerTable, eat));
+        university.add(new Philosopher("Kant", dinnerTable, eat));
+        university.add(new Philosopher("Socrates", dinnerTable, eat));
+        university.add(new Philosopher("Schopenhauer", dinnerTable, eat));
 
-    public static void main(String[] args) throws InterruptedException {
+        for (Philosopher philosopher:
+             university) {
+            philosopher.start();
+        }
 
-        DeadLock deadLock = new DeadLock();
-        //deadLock.startDeadLock();
-
-        Thread t1 = new Thread("T1"){
-            @Override
-            public void run() {
-                synchronized (deadLock.first) {
-                    System.out.println("Run t1");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    synchronized (deadLock.second){
-                        System.out.println("Work");
-                    }
-                }
-            }
-        };
-        Thread t2 = new Thread("T2"){
-            @Override
-            public void run() {
-                synchronized (deadLock.second) {
-                    System.out.println("Run t2");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    synchronized (deadLock.first){
-                        System.out.println("Work ");
-                    }
-                }
-            }
-        };
-
-        //t1.start();
-        //t2.start();
-//////////////////////////////////////////////////////
-        // task 2
-
-        Thread thread1 = new Thread(){
-            @Override
-            public void run() {
-                while (flag) {
-                    switcher = !switcher;
-                    System.out.println(switcher + " !");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        };
-        Thread thread2 = new Thread(){
-            @Override
-            public void run() {
-                int count = 20;
-                while (count != 0){
-                        if (switcher) {
-                            count--;
-                            System.out.println(" " + switcher + " -> " + count);
-                        }else {
-                            switcher = !switcher;
-                        }
-                        try {
-                            Thread.sleep(300);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                flag = false;
-                }
-
-            };
-
-        //thread1.start();
-        //thread2.start();
-///////////////////////////////////////////////////
-        //task 3
-
-        CountDownLatch latch = new CountDownLatch(3);
-        CountDownLatch latch2 = new CountDownLatch(1);
-        CountDownLatch latch3 = new CountDownLatch(3);
-
-
-        Runnrer runnrerA = new Runnrer(2000,latch,latch2,latch3,"Tom");
-        Runnrer runnrerB = new Runnrer(3000,latch,latch2,latch3,"Bob");
-        Runnrer runnrerC = new Runnrer(1000,latch,latch2,latch3,"Mike");
-
-        runnrerA.start();
-        runnrerB.start();
-        runnrerC.start();
-
-        latch.await();
-
-        System.out.println("On start");
-        System.out.println("Ready..");
-        System.out.println("Go");
-        Runnrer.race = true;
-        latch2.countDown();
-
-        latch3.await();
-        System.out.println("Finish!!");
-
+        eat.arriveAndDeregister();
+        if (eat.isTerminated()) {
+            System.out.println("Everyone ate");
+        }
     }
 }
