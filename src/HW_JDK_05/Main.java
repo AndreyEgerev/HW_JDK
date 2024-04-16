@@ -1,7 +1,6 @@
 package HW_JDK_05;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
 /*

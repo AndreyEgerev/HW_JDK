@@ -47,7 +47,7 @@ public class Philosopher extends Thread{
         try {
             Thread.sleep(TIME_EAT);
         } catch (InterruptedException e) {
-            System.out.println(name + " is interrupted");;
+            System.out.println(name + " is interrupted");
         }
         countEat++;
     }
@@ -56,7 +56,7 @@ public class Philosopher extends Thread{
         try {
             Thread.sleep(timeThink);
         } catch (InterruptedException e) {
-            System.out.println(name + " is interrupted");;
+            System.out.println(name + " is interrupted");
         }
     }
 }
